@@ -8,8 +8,15 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
+    public static String[] parseRequestLine(String requestLine){
+        if (requestLine == null || requestLine.isEmpty()) throw new RuntimeException("first line should not empty!");
+        String[] tokens = requestLine.split(" ");
+        if (tokens.length != 3) throw new RuntimeException("first line should be like (method url version)!");
+        return  tokens;
+
+    }
     /**
-     * @param queryString은
+     * @param queryString
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
@@ -18,7 +25,7 @@ public class HttpRequestUtils {
     }
 
     /**
-     * @param 쿠키
+     * @param cookies
      *            값은 name1=value1; name2=value2 형식임
      * @return
      */
