@@ -3,6 +3,8 @@ package util;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.io.*;
+import java.nio.file.Files;
 import java.util.Map;
 
 import org.junit.Test;
@@ -10,6 +12,18 @@ import org.junit.Test;
 import util.HttpRequestUtils.Pair;
 
 public class HttpRequestUtilsTest {
+    @Test
+    public void parseRequest() throws IOException {
+        // given
+        BufferedReader br = new BufferedReader(new InputStreamReader(Files.newInputStream(new File("./src/test/resources/Http_Get.txt").toPath())));
+        // when
+        HttpRequest request = HttpRequestUtils.parseRequest(br);
+        // then
+        assertEquals(request.getUrl(),"/user/login");
+        assertEquals(request.getMethod(), "GET");
+        assertEquals(request.getBody(), "userId=test&password=test");
+    }
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
