@@ -100,6 +100,7 @@ public class RequestHandler extends Thread {
                     break;
                 }
                 default: {
+                    if(request.getUrl().endsWith(".css")) responseHeaders.put("Content-Type","text/css");
                     responseBody = Files.readAllBytes(new File("./webapp" + request.getUrl()).toPath());
                     httpStatus = HttpStatus.HTTP_200_OK;
                     break;

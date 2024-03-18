@@ -15,7 +15,8 @@ public class HttpResponseUtils {
 
         try {
             dos.writeBytes("HTTP/1.1 " + response.getStatus().getCode() + " " + response.getStatus().getMessage() + " \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            if (!response.getHeaders().containsKey("Content-Type"))
+                dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + response.getBody().length + "\r\n");
             Map<String, String> headers = response.getHeaders();
             for (String key : headers.keySet()) dos.writeBytes(key + ": " + headers.get(key) + "\r\n");
