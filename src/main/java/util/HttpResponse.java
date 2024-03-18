@@ -5,18 +5,18 @@ package util;
 import java.util.Map;
 
 public class HttpResponse {
-    private final Status status;
+    private final HttpStatus httpStatus;
     private final Map<String, String> headers;
     private final byte[] body;
 
-    public HttpResponse(Status status, Map<String, String> headers, byte[] body) {
-        this.status = status;
+    public HttpResponse(HttpStatus httpStatus, Map<String, String> headers, byte[] body) {
+        this.httpStatus = httpStatus;
         this.headers = headers;
         this.body = body;
     }
 
-    public Status getStatus() {
-        return status;
+    public HttpStatus getStatus() {
+        return httpStatus;
     }
 
     public Map<String, String> getHeaders() {

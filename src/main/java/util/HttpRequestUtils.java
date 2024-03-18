@@ -1,6 +1,10 @@
 package util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -8,6 +12,35 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
+    public static HttpRequest parseRequest(BufferedReader br) throws IOException {
+        // 1. request line
+        String line = br.readLine();
+        String[] tokens = HttpRequestUtils.parseRequestLine(line);
+        String method = tokens[0];
+        String uri = tokens[1];
+        int index = uri.indexOf("?");
+        String url = uri.contains("?")?uri.substring(index):uri;
+        Map<String, String> queryString = parseQueryString(uri.substring(index+1));
+
+        // 2. headers
+        Map<String, String> headers = new HashMap<>();
+        while (!line.isEmpty()) {
+            line = br.readLine();
+            HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
+            if (pair != null) headers.put(pair.getKey(), pair.getValue());
+        }
+        int contentLength = headers.containsKey("Content-Length") ? Integer.parseInt(headers.get("Content-Length")) : 0;
+
+        // 3. body
+        String body = IOUtils.readData(br, contentLength);
+        HttpRequest request = new  HttpRequest();
+        request.setMethod(method);
+        request.setUrl(url);
+        request.setQueryString(queryString);
+        request.setHeaders(headers);
+        request.setBody(body);
+        return  request;
+    }
     public static String[] parseRequestLine(String requestLine){
         if (requestLine == null || requestLine.isEmpty()) throw new RuntimeException("first line should not empty!");
         String[] tokens = requestLine.split(" ");
