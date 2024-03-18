@@ -15,12 +15,12 @@ public class HttpRequestUtilsTest {
     @Test
     public void parseRequest() throws IOException {
         // given
-        BufferedReader br = new BufferedReader(new InputStreamReader(Files.newInputStream(new File("./src/test/resources/Http_Get.txt").toPath())));
+        BufferedReader br = new BufferedReader(new InputStreamReader(Files.newInputStream(new File("./src/test/resources/user_login.txt").toPath())));
         // when
         HttpRequest request = HttpRequestUtils.parseRequest(br);
         // then
         assertEquals(request.getUrl(),"/user/login");
-        assertEquals(request.getMethod(), "GET");
+        assertEquals(request.getMethod(), "POST");
         assertEquals(request.getBody(), "userId=test&password=test");
     }
 
