@@ -3,9 +3,6 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import db.DataBase;
@@ -51,13 +48,15 @@ public class RequestHandler extends Thread {
                 User user = new User(params.get("userId"),params.get("password"),params.get("name"),params.get("email"));
                 DataBase.addUser(user);
                 responseBody = "회원가입이 완료되었습니다.".getBytes();
+                DataOutputStream dos = new DataOutputStream(out);
+                response302Header(dos, "/index.html");
+                responseBody(dos, responseBody);
             }else{
                 responseBody = Files.readAllBytes(new File("./webapp"+url).toPath());
+                DataOutputStream dos = new DataOutputStream(out);
+                response200Header(dos, responseBody.length);
+                responseBody(dos, responseBody);
             }
-            // 3. Send Response
-            DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, responseBody.length);
-            responseBody(dos, responseBody);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -78,7 +77,7 @@ public class RequestHandler extends Thread {
     }
     private void response302Header(DataOutputStream dos, String location) {
         try {
-            dos.writeBytes("HTTP/1.1 301 Moved Permanently\n \r\n");
+            dos.writeBytes("HTTP/1.1 302 Found\n \r\n");
             dos.writeBytes("Location: " + location + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
