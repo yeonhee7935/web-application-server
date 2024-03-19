@@ -27,18 +27,14 @@ public class RequestHandler extends Thread {
     public void run() {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // 1. Parse Request
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
             HttpRequest request = HttpRequestUtils.parseRequest(in);
-            log.debug("URI: {} / URL: {}", request.getUri(), request.getUrl());
 
             // 2. Create Response
             Controller controller = this.handlerMapping.getController(request.getUrl());
             HttpResponse response = controller.service(request);
 
             // 3. Send Response
-            DataOutputStream dos = new DataOutputStream(out);
-
-            HttpResponseUtils.sendResponse(dos, response);
+            HttpResponseUtils.sendResponse(out, response);
         } catch (IOException e) {
             log.error(e.getMessage());
         }

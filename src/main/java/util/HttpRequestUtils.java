@@ -17,12 +17,7 @@ public class HttpRequestUtils {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         // 1. request line
         String line = br.readLine();
-        String[] tokens = HttpRequestUtils.parseRequestLine(line);
-        String method = tokens[0];
-        String uri = tokens[1];
-        int index = uri.indexOf("?");
-        String url = uri.contains("?") ? uri.substring(0, index) : uri;
-        Map<String, String> queryString = parseQueryString(uri.substring(index + 1));
+        RequestLine requestLine = new RequestLine(line);
 
         // 2. headers
         Map<String, String> headers = new HashMap<>();
@@ -40,24 +35,19 @@ public class HttpRequestUtils {
 
         // 3. body
         String body = IOUtils.readData(br, contentLength);
+
+        // 4. init request
         HttpRequest request = new HttpRequest();
-        request.setMethod(method);
-        request.setUri(uri);
-        request.setUrl(url);
-        request.setQueryString(queryString);
+        request.setMethod(request.getMethod());
+        request.setUri(requestLine.getUri());
+        request.setUrl(requestLine.getUrl());
+        request.setQueryString(request.getQueryString());
         request.setHeaders(headers);
         request.setCookies(cookies);
         request.setBody(body);
         return request;
     }
 
-    private static String[] parseRequestLine(String requestLine) {
-        if (requestLine == null || requestLine.isEmpty()) throw new RuntimeException("first line should not empty!");
-        String[] tokens = requestLine.split(" ");
-        if (tokens.length != 3) throw new RuntimeException("first line should be like (method url version)!");
-        return tokens;
-
-    }
 
     /**
      * @param queryString URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임

@@ -18,8 +18,8 @@ public class HttpRequest {
         this.uri = uri;
     }
 
-    public void setMethod(String method) {
-        this.method = HttpMethod.valueOf(method.toUpperCase());
+    public void setMethod(HttpMethod method) {
+        this.method =method;
     }
 
     public void setUrl(String url) {
