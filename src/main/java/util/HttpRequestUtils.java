@@ -2,6 +2,7 @@ package util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,46 +13,54 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
-    public static HttpRequest parseRequest(BufferedReader br) throws IOException {
+    public static HttpRequest parseRequest(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
         // 1. request line
         String line = br.readLine();
         String[] tokens = HttpRequestUtils.parseRequestLine(line);
         String method = tokens[0];
         String uri = tokens[1];
         int index = uri.indexOf("?");
-        String url = uri.contains("?")?uri.substring(0,index):uri;
-        Map<String, String> queryString = parseQueryString(uri.substring(index+1));
+        String url = uri.contains("?") ? uri.substring(0, index) : uri;
+        Map<String, String> queryString = parseQueryString(uri.substring(index + 1));
 
         // 2. headers
         Map<String, String> headers = new HashMap<>();
+        Map<String, String> cookies = new HashMap<>();
         while (!line.isEmpty()) {
             line = br.readLine();
             HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
-            if (pair != null) headers.put(pair.getKey(), pair.getValue());
+            if (pair != null) {
+                headers.put(pair.getKey(), pair.getValue());
+                if (pair.getKey().equals("Cookie")) cookies = parseCookies(pair.getValue());
+
+            }
         }
         int contentLength = headers.containsKey("Content-Length") ? Integer.parseInt(headers.get("Content-Length")) : 0;
 
         // 3. body
         String body = IOUtils.readData(br, contentLength);
-        HttpRequest request = new  HttpRequest();
+        HttpRequest request = new HttpRequest();
         request.setMethod(method);
         request.setUri(uri);
         request.setUrl(url);
         request.setQueryString(queryString);
         request.setHeaders(headers);
+        request.setCookies(cookies);
         request.setBody(body);
-        return  request;
+        return request;
     }
-    public static String[] parseRequestLine(String requestLine){
+
+    private static String[] parseRequestLine(String requestLine) {
         if (requestLine == null || requestLine.isEmpty()) throw new RuntimeException("first line should not empty!");
         String[] tokens = requestLine.split(" ");
         if (tokens.length != 3) throw new RuntimeException("first line should be like (method url version)!");
-        return  tokens;
+        return tokens;
 
     }
+
     /**
-     * @param queryString
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @param queryString URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
     public static Map<String, String> parseQueryString(String queryString) {
@@ -59,11 +68,10 @@ public class HttpRequestUtils {
     }
 
     /**
-     * @param cookies
-     *            값은 name1=value1; name2=value2 형식임
+     * @param cookies 값은 name1=value1; name2=value2 형식임
      * @return
      */
-    public static Map<String, String> parseCookies(String cookies) {
+    private static Map<String, String> parseCookies(String cookies) {
         return parseValues(cookies, ";");
     }
 
@@ -77,7 +85,7 @@ public class HttpRequestUtils {
                 .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
     }
 
-    static Pair getKeyValue(String keyValue, String regex) {
+    private static Pair getKeyValue(String keyValue, String regex) {
         if (Strings.isNullOrEmpty(keyValue)) {
             return null;
         }
@@ -90,11 +98,11 @@ public class HttpRequestUtils {
         return new Pair(tokens[0], tokens[1]);
     }
 
-    public static Pair parseHeader(String header) {
+    private static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
     }
 
-    public static class Pair {
+    private static class Pair {
         String key;
         String value;
 

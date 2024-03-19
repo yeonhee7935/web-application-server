@@ -8,6 +8,7 @@ public class HttpRequest {
     private String url;
     private Map<String, String> queryString;
     private Map<String, String> headers;
+    private Map<String, String> cookies;
     private String body;
 
     public HttpRequest() {
@@ -33,6 +34,10 @@ public class HttpRequest {
         this.headers = headers;
     }
 
+    public void setCookies(Map<String, String> cookies) {
+        this.cookies = cookies;
+    }
+
     public void setBody(String body) {
         this.body = body;
     }
@@ -55,6 +60,10 @@ public class HttpRequest {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public Map<String, String> getCookies() {
+        return cookies;
     }
 
     public String getBody() {

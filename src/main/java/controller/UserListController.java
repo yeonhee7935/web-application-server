@@ -21,7 +21,7 @@ public class UserListController extends AbstractController{
         Map<String, String> headers = new HashMap<>();
         byte[] body;
         HttpStatus status;
-        Map<String, String> cookies = HttpRequestUtils.parseCookies(request.getHeaders().get("Cookie"));
+        Map<String, String> cookies = request.getCookies();
         if (cookies.containsKey("logined") && Boolean.parseBoolean(cookies.get("logined"))) {
             Collection<User> users = DataBase.findAll();
             headers.put("Content-Type", "text/html; charset=utf-8");

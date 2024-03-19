@@ -25,14 +25,12 @@ public class RequestHandler extends Thread {
     }
 
     public void run() {
-        log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-                connection.getPort());
-
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // 1. Parse Request
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            HttpRequest request = HttpRequestUtils.parseRequest(br);
+            HttpRequest request = HttpRequestUtils.parseRequest(in);
             log.debug("URI: {} / URL: {}", request.getUri(), request.getUrl());
+
             // 2. Create Response
             Controller controller = this.handlerMapping.getController(request.getUrl());
             HttpResponse response = controller.service(request);
