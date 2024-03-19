@@ -3,7 +3,8 @@ package util;
 import java.util.Map;
 
 public class HttpRequest {
-    private String method;
+    private HttpMethod method;
+    private String uri;
     private String url;
     private Map<String, String> queryString;
     private Map<String, String> headers;
@@ -12,8 +13,12 @@ public class HttpRequest {
     public HttpRequest() {
     }
 
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
     public void setMethod(String method) {
-        this.method = method;
+        this.method = HttpMethod.valueOf(method.toUpperCase());
     }
 
     public void setUrl(String url) {
@@ -32,8 +37,12 @@ public class HttpRequest {
         this.body = body;
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
+    }
+
+    public String getUri() {
+        return uri;
     }
 
     public String getUrl() {

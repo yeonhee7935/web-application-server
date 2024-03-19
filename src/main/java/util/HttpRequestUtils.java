@@ -19,7 +19,7 @@ public class HttpRequestUtils {
         String method = tokens[0];
         String uri = tokens[1];
         int index = uri.indexOf("?");
-        String url = uri.contains("?")?uri.substring(index):uri;
+        String url = uri.contains("?")?uri.substring(0,index):uri;
         Map<String, String> queryString = parseQueryString(uri.substring(index+1));
 
         // 2. headers
@@ -35,6 +35,7 @@ public class HttpRequestUtils {
         String body = IOUtils.readData(br, contentLength);
         HttpRequest request = new  HttpRequest();
         request.setMethod(method);
+        request.setUri(uri);
         request.setUrl(url);
         request.setQueryString(queryString);
         request.setHeaders(headers);

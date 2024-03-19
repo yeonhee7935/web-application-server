@@ -5,9 +5,11 @@ package util;
 import java.util.Map;
 
 public class HttpResponse {
-    private final HttpStatus httpStatus;
-    private final Map<String, String> headers;
-    private final byte[] body;
+    private HttpStatus httpStatus;
+    private Map<String, String> headers;
+    private byte[] body;
+
+
 
     public HttpResponse(HttpStatus httpStatus, Map<String, String> headers, byte[] body) {
         this.httpStatus = httpStatus;
@@ -26,4 +28,6 @@ public class HttpResponse {
     public byte[] getBody() {
         return body;
     }
+
+
 }

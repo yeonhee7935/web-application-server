@@ -19,8 +19,8 @@ public class HttpRequestUtilsTest {
         // when
         HttpRequest request = HttpRequestUtils.parseRequest(br);
         // then
-        assertEquals(request.getUrl(),"/user/login");
-        assertEquals(request.getMethod(), "POST");
+        assertEquals(request.getUrl(), "/user/login");
+        assertEquals(request.getMethod(), HttpMethod.POST);
         assertEquals(request.getBody(), "userId=test&password=test");
     }
 
