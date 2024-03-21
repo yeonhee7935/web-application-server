@@ -6,6 +6,7 @@ import http.HttpResponse;
 import java.util.Collection;
 import java.util.Map;
 
+import http.HttpSession;
 import model.User;
 import util.HttpRequestUtils;
 import db.DataBase;
@@ -13,7 +14,8 @@ import db.DataBase;
 public class ListUserController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
-        if (!isLogin(request.getHeader("Cookie"))) {
+        HttpSession session = request.getSession();
+        if(!isLogined(session)){
             response.sendRedirect("/user/login.html");
             return;
         }
@@ -39,5 +41,10 @@ public class ListUserController extends AbstractController {
             return false;
         }
         return Boolean.parseBoolean(value);
+    }
+
+    private boolean isLogined(HttpSession session) {
+        Object user = session.getAttribute("user");
+        return user!=null;
     }
 }
