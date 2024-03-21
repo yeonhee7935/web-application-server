@@ -18,13 +18,10 @@ public class HttpResponse {
     private DataOutputStream dos = null;
 
     private Map<String, String> headers = new HashMap<String, String>();
+    private Map<String, String> cookies = new HashMap<>();
 
     public HttpResponse(OutputStream out) {
         dos = new DataOutputStream(out);
-    }
-
-    public void addHeader(String key, String value) {
-        headers.put(key, value);
     }
 
     public void forward(String url) {
@@ -86,12 +83,28 @@ public class HttpResponse {
 
     private void processHeaders() {
         try {
-            Set<String> keys = headers.keySet();
-            for (String key : keys) {
+            Set<String> headerKeys = headers.keySet();
+            for (String key : headerKeys) {
                 dos.writeBytes(key + ": " + headers.get(key) + " \r\n");
+            }
+            Set<String> cookieKeys = cookies.keySet();
+            if(!cookieKeys.isEmpty()){
+                StringBuilder cookieStr = new StringBuilder();
+                cookieStr.append("Set-Cookie: ");
+                for(String key: cookieKeys){
+                    cookieStr.append(key);
+                    cookieStr.append("=");
+                    cookieStr.append(cookies.get(key));
+                    cookieStr.append(";");
+                }
+                dos.writeBytes(cookieStr.toString() + " \r\n");
             }
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    public void addCookie(String key, String value) {
+        cookies.put(key, value);
     }
 }

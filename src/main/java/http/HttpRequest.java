@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ public class HttpRequest {
 	private RequestLine requestLine;
 
 	private HttpHeaders headers;
+	private HttpCookies cookies;
 	
 	private RequestParams requestParams = new RequestParams();
 
@@ -25,6 +28,7 @@ public class HttpRequest {
 			requestLine = new RequestLine(createRequestLine(br));
 			requestParams.addQueryString(requestLine.getQueryString());
 			headers = processHeaders(br);
+			cookies = processCookies();
 			requestParams.addBody(IOUtils.readData(br, headers.getContentLength()));
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -47,6 +51,18 @@ public class HttpRequest {
 		}
 		return headers;
 	}
+	private HttpCookies processCookies() throws IOException {
+		String cookieStr = headers.getHeader("Cookie");
+		if(cookieStr==null) return new HttpCookies(new HashMap<>());
+
+		Map<String, String> cookieResult = new HashMap<>();
+		String[] cookieMap = cookieStr.split(";");
+		for(String cookie: cookieMap){
+			String[] entry = cookie.trim().split("=");
+			cookieResult.put(entry[0].trim(), entry[1].trim());
+		}
+		return new HttpCookies(cookieResult);
+	}
 
 	public HttpMethod getMethod() {
 		return requestLine.getMethod();
@@ -62,5 +78,13 @@ public class HttpRequest {
 
 	public String getParameter(String name) {
 		return requestParams.getParameter(name);
+	}
+	public HttpCookies getCookies(){
+		return cookies;
+	}
+
+	public HttpSession getSession(){
+		String sessionId = cookies.getAll().get("JSESSIONID");
+        return HttpSessions.getSession(sessionId);
 	}
 }
